@@ -1,7 +1,7 @@
 # Learning Data Engineering - Zoomcamp 2026
 ![Status](https://img.shields.io/badge/Status-In_Progress-yellow)
-<!--!
-[Status](https://img.shields.io/badge/Status-Completed-green)
+<!--
+![Status](https://img.shields.io/badge/Status-Completed-green)
 -->
 
 ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
@@ -28,16 +28,17 @@ PUSH    → Commit my own code to this repository
 
 ## Progress
  
-| Module | Topic | Status |
-|--------|-------|--------|
-| Module 1 | Containerization & Infrastructure as Code | 🟡 In Progress |
-| Module 2 | Workflow Orchestration | ⬜ Upcoming |
-| Workshop | Data Ingestion | ⬜ Upcoming |
-| Module 3 | Data Warehousing | ⬜ Upcoming |
-| Module 4 | Analytics Engineering | ⬜ Upcoming |
-| Module 5 | Data Platforms | ⬜ Upcoming |
-| Module 6 | Batch Processing | ⬜ Upcoming |
-| Module 7 | Streaming | ⬜ Upcoming |
+| Module     | Topic                    | Status        |
+| ---------- | ------------------------ | ------------- |
+| Module 1.A | Containerization as Code | 💚 Completed   |
+| Module 1.B | Infrastructure as Code   | 🟡 In Progress |
+| Module 2   | Workflow Orchestration   | ⬜ Upcoming    |
+| Workshop   | Data Ingestion           | ⬜ Upcoming    |
+| Module 3   | Data Warehousing         | ⬜ Upcoming    |
+| Module 4   | Analytics Engineering    | ⬜ Upcoming    |
+| Module 5   | Data Platforms           | ⬜ Upcoming    |
+| Module 6   | Batch Processing         | ⬜ Upcoming    |
+| Module 7   | Streaming                | ⬜ Upcoming    |
 
 ## Repository Structure
  

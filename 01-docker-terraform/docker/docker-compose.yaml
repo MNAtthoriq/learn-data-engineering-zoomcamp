@@ -1,0 +1,43 @@
+services:
+  pgdb:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: 'root'
+      POSTGRES_PASSWORD: 'root'
+      POSTGRES_DB: 'ny_taxi'
+    volumes:
+      - ny_taxi_data:/var/lib/postgresql
+    ports:
+      - 5432:5432
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
+      PGADMIN_DEFAULT_PASSWORD: 'root'
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - 8085:80
+    depends_on:
+      - pgdb
+  
+  ingest_data:
+    build:
+      context: ../..
+      dockerfile: ./01-docker-terraform/docker/Dockerfile
+    environment:
+      PG_USER: 'root'
+      PG_PASS: 'root'
+      PG_HOST: 'pgdb'
+      PG_PORT: 5432
+      PG_DB: 'ny_taxi'
+    depends_on:
+      - pgdb
+      - pgadmin
+  
+volumes:
+  ny_taxi_data:
+    name: ny_taxi_data
+  pgadmin_data:
+    name: pgadmin_data
