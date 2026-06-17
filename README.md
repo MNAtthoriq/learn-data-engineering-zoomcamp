@@ -1,4 +1,4 @@
-# Learning Data Engineering - Zoomcamp 2026
+# BEYOND ZOOMCAMP: Data Engineering Projects Collection 
 ![Status](https://img.shields.io/badge/Status-In_Progress-yellow)
 <!--
 ![Status](https://img.shields.io/badge/Status-Completed-green)
@@ -16,29 +16,31 @@
 ![Apache Kafka](https://img.shields.io/badge/Apache_Kafka-231F20?logo=apachekafka&logoColor=white)
 -->
 
-Personal learning repository for [Data Engineering Zoomcamp 2026](https://github.com/DataTalksClub/data-engineering-zoomcamp) by DataTalksClub. This repository documents my learning journey through the Zoomcamp. Each module contains working code I wrote myself, problems I encountered, and how I solved them.
+This repository is a growing collection of Data Engineering projects. It is `not` a compilation of lecture notes. 
+
+I am using [Data Engineering Zoomcamp](https://github.com/DataTalksClub/data-engineering-zoomcamp) curriculum as a foundation. For each module, instead of blindly copy-pasting completed code, I close the tutorial and rebuild the project. My goals is not to reproduce same lecture code, but to compose a better version of my own.
+
+I push it beyond tutorial. Beyond Zoomcamp.
 
 ```
-LEARN   → Watch the lecture and take handwritten notes
-CLOSE   → Stop passively following step-by-step tutorial
-BUILD   → Coding from scratch without looking back
-EXPLORE → Break, extend, and review intentionally
-PUSH    → Commit my own code to this repository
+LEARN  → Learn the concepts
+CLOSE  → Close the tutorial
+BUILD  → Build better projects
 ```
 
 ## Progress
- 
-| Module     | Topic                    | Status        |
-| ---------- | ------------------------ | ------------- |
-| Module 1.A | Containerization as Code | 💚 Completed   |
-| Module 1.B | Infrastructure as Code   | 💚 Completed   |
-| Module 2   | Workflow Orchestration   | 🟡 In Progress |
-| Workshop   | Data Ingestion           | ⬜ Upcoming    |
-| Module 3   | Data Warehousing         | ⬜ Upcoming    |
-| Module 4   | Analytics Engineering    | ⬜ Upcoming    |
-| Module 5   | Data Platforms           | ⬜ Upcoming    |
-| Module 6   | Batch Processing         | ⬜ Upcoming    |
-| Module 7   | Streaming                | ⬜ Upcoming    |
+
+| Module | Project | Status | Stack |
+|---|---|:---:|:---:|
+| 1.A - Containerization | [Taxi Data Ingestion Pipeline](01-docker-terraform/docker/) | 💚 Done | <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white"> <img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white"><br><img src="https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white"> |
+| 1.B - Infrastructure as Code | [Containerized Data Platform Infrastructure](01-docker-terraform/terraform/) | 💚 Done | <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white"> <img src="https://img.shields.io/badge/Terraform-844FBA?logo=terraform&logoColor=white"><br><img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white"> |
+| 2 - Workflow Orchestration | — | 🟡 Progress | — |
+| 3 - Data Warehousing | — | ⬜ Upcoming | — |
+| 4 - Analytics Engineering | — | ⬜ Upcoming | — |
+| 5 - Data Platforms | — | ⬜ Upcoming | — |
+| 6 - Batch Processing | — | ⬜ Upcoming | — |
+| 7 - Streaming | — | ⬜ Upcoming | — |
+| Data Ingestion Workshop | — | ⬜ Upcoming | — |
 
 ## Repository Structure
  
@@ -46,13 +48,12 @@ PUSH    → Commit my own code to this repository
 learn-data-engineering-zoomcamp/
 ├── 01-docker-terraform/        ← completed
 ├── 02-workflow-orchestration/  ← (in progress)
-├── workshop-data-ingestion/    ← coming soon
 ├── 03-data-warehouse/          ← coming soon
 ├── 04-analytics-engineering/   ← coming soon
 ├── 05-data-platforms/          ← coming soon
 ├── 06-batch/                   ← coming soon
 ├── 07-streaming/               ← coming soon
-├── homework/                   ← (in progress)
+├── workshop-data-ingestion/    ← coming soon
 ├── pyproject.toml
 ├── uv.lock
 ├── .python-version
@@ -72,12 +73,9 @@ cd learn-data-engineering-zoomcamp
  
 # Install dependencies
 uv sync --locked
- 
-# Run any script
-uv run 01-docker-terraform/docker/ingest_data.py
 ```
 
-> Every modules have their own README.md to tell about their usage setup.
+> Each project's README has its own run instructions.
 
 ## References
 

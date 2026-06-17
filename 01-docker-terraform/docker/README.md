@@ -1,6 +1,7 @@
-# Module 1.A: Containerization as Code
+# Taxi Data Ingestion Pipeline
 
 ![Status](https://img.shields.io/badge/Status-Completed-green)
+![Module](https://img.shields.io/badge/Module%201.A-Containerization-blue)
 
 ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
@@ -21,8 +22,8 @@ What I improve from [original tutorial:](https://github.com/DataTalksClub/data-e
 
 ## Key Learnings
 
-|        Concept         | What I Learned                                                                                                                                                                                                                                             |
-| :--------------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|        Concept         | What I Learned             |
+| :--------------------: | -------------------------- |
 |    Path resolution     | Path resolution follows the caller, not the runner. Example: `context:` block in `docker-compose.yaml` resolves from the compose file's location, while `docker build -t name:tag build_context` for `Dockerfile` resolves from wherever your terminal is. |
 | Click + Docker Compose | `docker compose up` can't pass CLI flags hence use `envvar=` in `@click.option()` so your script reads from environment variables instead, making it fully compatible with Compose's `environment:` block.                                                 |
 |  Inconsistent Pandas   | Pandas is inconsistent with missing columns. `dtype` silently ignores keys that don't match, but `parse_dates` raises a ValueError. Always validate columns exist before passing to `parse_dates`.                                                         |
@@ -83,3 +84,9 @@ Open http://localhost:8085 in your browser.
 | MONTH         | --month         | 6         | Month of taxi data to ingest (1-12, max 7 for 2021) |
 | CHUNKSIZE     | --chunksize     | 100000    | Number of rows to read per chunk                    |
 | FORCE_REPLACE | --force_replace | False     | Force overwrite of existing table                   |
+
+## Reference
+
+- Module 1.A - Containerization: https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main/01-docker-terraform/docker-sql
+- Docker Documentation: https://docs.docker.com/engine/
+- Docker Image Hub: https://hub.docker.com/search?sort=pull_count&order=desc

@@ -1,6 +1,7 @@
-# Module 1.B: Infrastructure as Code
+# Containerized Data Platform Infrastructure
 
 ![Status](https://img.shields.io/badge/Status-Completed-green)
+![Module](https://img.shields.io/badge/Module%201.B-Infrastructure%20as%20Code-blue)
 
 ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
@@ -124,3 +125,8 @@ terraform destroy
 | `pgadmin_user`      | pgAdmin login email             | `admin@admin.com`       |    No     |
 | `pgadmin_password`  | pgAdmin login password          | `root`                  |    Yes    |
 | `pgadmin_port`      | Host port exposed for pgAdmin   | `8010`                  |    No     |
+
+## Reference
+
+- Module 1.B - Infrastructure as Code: https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main/01-docker-terraform/terraform
+- Terraform - Docker Documentation: https://registry.terraform.io/providers/kreuzwerker/docker/latest/docs
