@@ -87,6 +87,7 @@ Open http://localhost:8085 in your browser.
 
 ## Reference
 
-- Module 1.A - Containerization: https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main/01-docker-terraform/docker-sql
-- Docker Documentation: https://docs.docker.com/engine/
-- Docker Image Hub: https://hub.docker.com/search?sort=pull_count&order=desc
+- [DE Projects - Beyond Zoomcamp](../../)
+- [Module 1.A - Containerization](https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main/01-docker-terraform/docker-sql)
+- [Docker Documentation](https://docs.docker.com/engine/)
+- [Docker Image Hub](https://hub.docker.com/search?sort=pull_count&order=desc)

@@ -128,5 +128,6 @@ terraform destroy
 
 ## Reference
 
-- Module 1.B - Infrastructure as Code: https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main/01-docker-terraform/terraform
-- Terraform - Docker Documentation: https://registry.terraform.io/providers/kreuzwerker/docker/latest/docs
+- [DE Projects - Beyond Zoomcamp](../../)
+- [Module 1.B - Infrastructure as Code](https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main/01-docker-terraform/terraform)
+- [Terraform - Docker Documentation](https://registry.terraform.io/providers/kreuzwerker/docker/latest/docs)
