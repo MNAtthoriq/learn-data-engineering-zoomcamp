@@ -1,5 +1,7 @@
 id: 00_environment_setup
 namespace: zoomcamp
+labels:
+  stage: misc
 description: |
   This flow is for setup KV in Kestra. It only run ONCE per environment/machine,
   right after `terraform apply`.

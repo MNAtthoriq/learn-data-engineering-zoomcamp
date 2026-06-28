@@ -1,7 +1,9 @@
 id: 01_taxi_tripdata_pipeline
 namespace: zoomcamp
+labels:
+  stage: ELT
 description: |
-  Pulls live monthly parquet release from TLC's official CDN into
+  Pulls live monthly taxi tripdata parquet release from TLC's official CDN into
   BigQuery Database with automatic retry and quality data check.
 
 concurrency:
@@ -84,7 +86,7 @@ tasks:
             *
           FROM `{{ render(vars.ext_table) }}`;
       
-      - id: yellow_quality_table
+      - id: yellow_quality_gate
         type: io.kestra.plugin.gcp.bigquery.Query
         description: Raises SQL error if tmp_table have zero row or duplicated unique_row_id
         sql: |
@@ -160,7 +162,7 @@ tasks:
             *
           FROM `{{ render(vars.ext_table) }}`;
       
-      - id: green_quality_table
+      - id: green_quality_gate
         type: io.kestra.plugin.gcp.bigquery.Query
         description: Raises SQL error if tmp_table have zero row or duplicated unique_row_id
         sql: |

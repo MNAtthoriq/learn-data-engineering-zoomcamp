@@ -1,0 +1,145 @@
+id: 03_dashboard_views_pipeline
+namespace: zoomcamp
+labels:
+  stage: dashboard
+descriptions: |
+  Builds a BigQuery Views to make dashboard for easier monitoring
+
+inputs:
+  - id: skip_freshness_gate
+    type: BOOLEAN
+    displayName: Skip freshness check (dev only)
+    description: |
+      TRUE only if you execute this flow manually without re-running 01 and 02 flows.
+    defaults: false
+
+variables:
+  schema_table: "{{ kv('GCP_PROJECT_ID') }}.{{ kv('GCP_DATASET') }}.INFORMATION_SCHEMA.TABLES"
+  yellow_table: "{{ kv('GCP_PROJECT_ID') }}.{{ kv('GCP_DATASET') }}.yellow_tripdata"
+  green_table: "{{ kv('GCP_PROJECT_ID') }}.{{ kv('GCP_DATASET') }}.green_tripdata"
+  zone_table: "{{ kv('GCP_PROJECT_ID') }}.{{ kv('GCP_DATASET') }}.taxi_zone"
+  monitoring_view: "{{ kv('GCP_PROJECT_ID') }}.{{ kv('GCP_DATASET') }}.monitoring"
+
+tasks:
+  - id: prerequisites_gate
+    type: io.kestra.plugin.gcp.bigquery.Query
+    description: |
+      Fails if there is no yellow_tripdata, green_tripdata, and taxi_zone base table.
+      If fail, you need to execute 01 and 02 flows first, atleast once.
+    sql: |
+      SELECT IF(
+        COUNT(*) < 3,
+        ERROR(CONCAT(
+          'Quality gate failed: missing prerequisite table(s). Found only: ',
+          IFNULL(STRING_AGG(table_name, ', '), 'none')
+        )),
+        COUNT(*)
+      ) AS tables_found
+      FROM `{{ render(vars.schema_table) }}`
+      WHERE table_name IN ('yellow_tripdata', 'green_tripdata', 'taxi_zone')
+        AND table_type = 'BASE TABLE';
+
+  - id: freshness_flow
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{ inputs.skip_freshness_gate == false }}"
+    description: Skippable via input skip_freshness_gate on a manual execution
+    then:
+      - id: freshness_gate
+        type: io.kestra.plugin.gcp.bigquery.Query
+        description: Confirms yellow_tripdata, green_tripdata, and taxi_zone loaded within last 6 hours
+        sql: |
+          WITH freshness AS (
+            SELECT 'yellow_tripdata' AS source, MAX(loaded_at) AS last_loaded
+            FROM `{{ render(vars.yellow_table) }}`
+            UNION ALL
+            SELECT 'green_tripdata' AS source, MAX(loaded_at) AS last_loaded
+            FROM `{{ render(vars.green_table) }}`
+            UNION ALL
+            SELECT 'taxi_zone' AS source, MAX(loaded_at) AS last_loaded
+            FROM `{{ render(vars.zone_table) }}`
+          )
+          SELECT IF(
+            COUNTIF(last_loaded IS NULL OR last_loaded < TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 6 HOUR)) > 0,
+            ERROR(CONCAT(
+              'Quality gate failed: stale or missing load for: ',
+              STRING_AGG(IF(
+                last_loaded IS NULL OR last_loaded < TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 6 HOUR),
+                source, NULL
+              ), ', ')
+            )),
+            1
+          ) AS freshness_ok
+          FROM freshness;
+  
+  - id: monitoring_view
+    type: io.kestra.plugin.gcp.bigquery.Query
+    description: Monitoring view for dashboard to check data upload and quality
+    sql: |
+      CREATE OR REPLACE VIEW `{{ render(vars.monitoring_view) }}` AS
+      WITH unioned AS (
+        SELECT
+          'yellow' AS taxi_type, filename, loaded_at,
+          tpep_pickup_datetime AS pickup_datetime,
+          tpep_dropoff_datetime AS dropoff_datetime,
+          fare_amount, total_amount, trip_distance,
+          PULocationID, DOLocationID
+        FROM `{{ render(vars.yellow_table) }}`
+        UNION ALL
+        SELECT
+          'green' AS taxi_type, filename, loaded_at,
+          lpep_pickup_datetime AS pickup_datetime,
+          lpep_dropoff_datetime AS dropoff_datetime,
+          fare_amount, total_amount, trip_distance,
+          PULocationID, DOLocationID
+        FROM `{{ render(vars.green_table) }}`
+      )
+      SELECT
+        taxi_type, filename, MIN(loaded_at) AS loaded_at, COUNT(*) AS row_count,
+        MIN(pickup_datetime) AS earliest_pickup,
+        MAX(pickup_datetime) AS latest_pickup,
+        COUNTIF(pickup_datetime IS NULL OR dropoff_datetime IS NULL) AS null_datetime_count,
+        COUNTIF(fare_amount IS NULL OR total_amount IS NULL) AS null_amount_count,
+        COUNTIF(trip_distance IS NULL) AS null_distance_count,
+        COUNTIF(PULocationID IS NULL OR DOLocationID IS NULL) AS null_location_count,
+        COUNTIF(dropoff_datetime < pickup_datetime) AS negative_duration_count,
+        COUNTIF(fare_amount < 0 OR total_amount < 0) AS negative_amount_count,
+        COUNTIF(trip_distance < 0) AS negative_distance_count,
+        COUNTIF(trip_distance > 0 AND fare_amount = 0) AS zero_fare_with_distance_count,
+        (
+          COUNTIF(pickup_datetime IS NULL OR dropoff_datetime IS NULL)
+          + COUNTIF(fare_amount IS NULL OR total_amount IS NULL)
+          + COUNTIF(trip_distance IS NULL)
+          + COUNTIF(PULocationID IS NULL OR DOLocationID IS NULL)
+          + COUNTIF(dropoff_datetime < pickup_datetime) 
+          + COUNTIF(fare_amount < 0 OR total_amount < 0)
+          + COUNTIF(trip_distance < 0) 
+          + COUNTIF(trip_distance > 0 AND fare_amount = 0)
+        ) AS total_anomaly_count
+      FROM unioned
+      GROUP BY taxi_type, filename
+      ORDER BY loaded_at DESC;
+
+pluginDefaults:
+  - type: io.kestra.plugin.gcp
+    values:
+      serviceAccount: "{{ secret('GCP_CREDS') }}"
+      projectId: "{{ kv('GCP_PROJECT_ID') }}"
+      location: "{{ kv('GCP_LOCATION') }}"
+      bucket: "{{ kv('GCP_BUCKET_NAME') }}"
+
+triggers:
+  - id: after_etl
+    type: io.kestra.plugin.core.trigger.Flow
+    preconditions:
+      id: upstream_success
+      timeWindow:
+        type: DAILY_TIME_WINDOW
+        startTime: "08:00:00"
+        endTime: "12:00:00"
+      flows:
+        - namespace: zoomcamp
+          flowId: 01_taxi_tripdata_pipeline
+          states: [SUCCESS]
+        - namespace: zoomcamp
+          flowId: 02_taxi_zone_pipeline
+          states: [SUCCESS]

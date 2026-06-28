@@ -1,0 +1,29 @@
+id: 99_monitoring_alerts
+namespace: zoomcamp.monitoring
+labels:
+  stage: misc
+description: Send email if any flow in zoomcamp namespace ends in failed or warning state
+
+tasks:
+  - id: send_alert
+    type: io.kestra.plugin.notifications.mail.MailExecution
+    from: "{{ secret('GMAIL_ADDRESS') }}"
+    to: "{{ secret('GMAIL_ADDRESS') }}"
+    username: "{{ secret('GMAIL_ADDRESS') }}"
+    password: "{{ secret('GMAIL_APP_PASSWORD') }}"
+    host: smtp.gmail.com
+    port: 465
+    transportStrategy: SMTPS
+    subject: "Kestra alert: {{ trigger.flowId }} ({{ trigger.executionId }})"
+    executionId: "{{ trigger.executionId }}"
+
+triggers:
+  - id: listen_for_failures
+    type: io.kestra.plugin.core.trigger.Flow
+    conditions:
+      - type: io.kestra.plugin.core.condition.ExecutionStatus
+        in:
+          - FAILED
+          - WARNING
+      - type: io.kestra.plugin.core.condition.ExecutionNamespace
+        namespace: zoomcamp

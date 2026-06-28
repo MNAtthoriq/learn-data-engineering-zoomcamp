@@ -1,0 +1,96 @@
+id: 02_taxi_zone_pipeline
+namespace: zoomcamp
+labels:
+  stage: ELT
+description: |
+  Pulls live monthly taxi zone csv release from TLC's official CDN into
+  BigQuery Database with automatic retry and quality data check.
+
+variables:
+  file: taxi_zone_lookup.csv
+  gcs_file: "gs://{{ kv('GCP_BUCKET_NAME') }}/{{ vars.file }}"
+  ext_table: "{{ kv('GCP_PROJECT_ID') }}.{{ kv('GCP_DATASET') }}.taxi_zone_ext"
+  zone_table: "{{ kv('GCP_PROJECT_ID') }}.{{ kv('GCP_DATASET') }}.taxi_zone"
+  data: "{{ outputs.extract.outputFiles[render(vars.file)] }}"
+
+tasks:
+  - id: extract
+    type: io.kestra.plugin.scripts.shell.Commands
+    outputFiles:
+      - "*.csv"
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    commands:
+      - wget -q "https://d37ci6vzurychx.cloudfront.net/misc/{{render(vars.file)}}" -O "{{render(vars.file)}}"
+    retry:
+      type: constant
+      interval: PT30S
+      maxAttempt: 5
+      maxDuration: PT10M
+    
+  - id: upload_to_gcs
+    type: io.kestra.plugin.gcp.gcs.Upload
+    from: "{{ render(vars.data) }}"
+    to: "{{ render(vars.gcs_file) }}"
+    retry:
+      type: constant
+      interval: PT15S
+      maxAttempt: 3
+
+  - id: ext_table
+    type: io.kestra.plugin.gcp.bigquery.Query
+    description: Create external table from .csv
+    sql: |
+      CREATE OR REPLACE EXTERNAL TABLE `{{ render(vars.ext_table) }}`
+      (LocationID INT64, Borough STRING, Zone STRING, service_zone STRING)
+      OPTIONS (
+        format = 'CSV',
+        skip_leading_rows = 1,
+        uris = ['{{ render(vars.gcs_file) }}']
+      );
+  
+  - id: quality_gate
+    type: io.kestra.plugin.gcp.bigquery.Query
+    description: Raises SQL error if ext_table have zero row or duplicated LocationID
+    sql: |
+      SELECT IF(
+        COUNT(*) = 0,
+        ERROR(CONCAT('Quality gate failed: ', '{{ render(vars.file) }}', ' loaded 0 rows')),
+        IF(
+          COUNT(*) > COUNT(DISTINCT LocationID),
+          ERROR(CONCAT('Quality gate failed: ', '{{ render(vars.file) }}', ' has duplicated LocationID')),
+          COUNT(*)
+        )
+      ) AS row_count
+      FROM `{{ render(vars.ext_table) }}`;
+  
+  - id: zone_table
+    type: io.kestra.plugin.gcp.bigquery.Query
+    description: Create taxi zone data with loaded_at
+    sql: |
+      CREATE OR REPLACE TABLE `{{ render(vars.zone_table) }}` AS
+      SELECT *, CURRENT_TIMESTAMP() AS loaded_at
+      FROM `{{ render(vars.ext_table) }}`;
+  
+  - id: ext_cleanup
+    type: io.kestra.plugin.gcp.bigquery.Query
+    description: Drop ext_table after using
+    sql: |
+      DROP EXTERNAL TABLE IF EXISTS `{{ render(vars.ext_table) }}`;
+  
+  - id: purge_files
+    type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
+    description: Remove downloaded files from Kestra's internal storage so it doesn't accumulate.
+
+pluginDefaults:
+  - type: io.kestra.plugin.gcp
+    values:
+      serviceAccount: "{{ secret('GCP_CREDS') }}"
+      projectId: "{{ kv('GCP_PROJECT_ID') }}"
+      location: "{{ kv('GCP_LOCATION') }}"
+      bucket: "{{ kv('GCP_BUCKET_NAME') }}"
+
+triggers:
+  - id: zone_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 8 5 * *"

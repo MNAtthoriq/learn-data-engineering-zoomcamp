@@ -50,6 +50,7 @@ resource "google_bigquery_dataset" "warehouse" {
   project = var.project_id
   location = var.region
   dataset_id = var.dataset_id
+  delete_contents_on_destroy  = true
   
   depends_on = [ google_project_service.required ]
 }
