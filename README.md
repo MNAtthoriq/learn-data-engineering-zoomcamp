@@ -81,6 +81,12 @@ uv sync --locked
 
 > Each project's README has its own run instructions.
 
+## Author
+
+**Muhammad Naufal At-Thoriq**
+- GitHub: [MNAtthoriq](https://github.com/MNAtthoriq)
+- LinkedIn: [Muhammad Naufal At-Thoriq](https://linkedin.com/in/mnatthoriq)
+
 ## References
 
 - Data Engineering Zoomcamp: https://github.com/DataTalksClub/data-engineering-zoomcamp

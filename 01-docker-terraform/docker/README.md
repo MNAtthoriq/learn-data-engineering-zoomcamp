@@ -85,6 +85,12 @@ Open http://localhost:8085 in your browser.
 | CHUNKSIZE     | --chunksize     | 100000    | Number of rows to read per chunk                    |
 | FORCE_REPLACE | --force_replace | False     | Force overwrite of existing table                   |
 
+## Author
+
+**Muhammad Naufal At-Thoriq**
+- GitHub: [MNAtthoriq](https://github.com/MNAtthoriq)
+- LinkedIn: [Muhammad Naufal At-Thoriq](https://linkedin.com/in/mnatthoriq)
+
 ## Reference
 
 - [DE Projects - Beyond Zoomcamp](../../)

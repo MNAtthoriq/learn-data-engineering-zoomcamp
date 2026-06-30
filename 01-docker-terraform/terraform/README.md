@@ -126,6 +126,12 @@ terraform destroy
 | `pgadmin_password`  | pgAdmin login password          | `root`                  |    Yes    |
 | `pgadmin_port`      | Host port exposed for pgAdmin   | `8010`                  |    No     |
 
+## Author
+
+**Muhammad Naufal At-Thoriq**
+- GitHub: [MNAtthoriq](https://github.com/MNAtthoriq)
+- LinkedIn: [Muhammad Naufal At-Thoriq](https://linkedin.com/in/mnatthoriq)
+
 ## Reference
 
 - [DE Projects - Beyond Zoomcamp](../../)
